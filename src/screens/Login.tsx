@@ -1,0 +1,114 @@
+// src/screens/Login.tsx
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+
+// navigation.tsで定義したルート名の型をインポート（パスは適宜変更してください）
+import type { RootStackParamList } from '../types/navigation';
+
+// Login画面用のナビゲーション型定義
+type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+
+export default function LoginScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [message2, setMessage2] = useState('');
+
+  const navigation = useNavigation<LoginScreenNavigationProp>();
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://192.168.0.64:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('ログイン成功', 'ダッシュボードへ移動します');
+        navigation.navigate('Dashboard'); // 型安全に画面遷移
+      } else {
+        if (data.error?.password?._errors) {
+          setMessage(`エラー: ${data.error.password._errors[0]}`);
+        }
+        if (data.error?.email?._errors) {
+          setMessage2(`エラー: ${data.error.email._errors[0]}`);
+        }
+        if (typeof data.error === 'string') {
+          Alert.alert('ログインエラー', data.error);
+        }
+      }
+    } catch (error) {
+      setMessage('サインイン中にエラーが発生しました');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>ログイン</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="メールアドレス"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="パスワード"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+
+      {message ? <Text style={styles.error}>{message}</Text> : null}
+      {message2 ? <Text style={styles.error}>{message2}</Text> : null}
+
+      <Button title="ログイン" onPress={handleLogin} />
+
+      {/* <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+        <Text style={styles.link}>アカウントをまだ登録していませんか?</Text>
+      </TouchableOpacity> */}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#F9FAFB',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 24,
+    textAlign: 'center',
+    color: '#111827',
+  },
+  input: {
+    height: 48,
+    borderColor: '#D1D5DB',
+    borderWidth: 1,
+    borderRadius: 6,
+    marginBottom: 12,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
+  },
+  error: {
+    color: 'red',
+    marginBottom: 8,
+  },
+  link: {
+    marginTop: 20,
+    color: '#4F46E5',
+    textAlign: 'center',
+  },
+});
