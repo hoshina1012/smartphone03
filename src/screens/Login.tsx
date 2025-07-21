@@ -1,8 +1,9 @@
-// src/screens/Login.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 // navigation.tsで定義したルート名の型をインポート（パスは適宜変更してください）
 import type { RootStackParamList } from '../types/navigation';
@@ -19,33 +20,50 @@ export default function LoginScreen() {
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
-    try {
-      const response = await fetch('http://192.168.0.64:3000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const response = await fetch('https://nextjs-skill-viewer.vercel.app/api/smartphone/auth/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.ok) {
-        Alert.alert('ログイン成功', 'ダッシュボードへ移動します');
-        navigation.navigate('Dashboard'); // 型安全に画面遷移
-      } else {
-        if (data.error?.password?._errors) {
-          setMessage(`エラー: ${data.error.password._errors[0]}`);
-        }
-        if (data.error?.email?._errors) {
-          setMessage2(`エラー: ${data.error.email._errors[0]}`);
-        }
-        if (typeof data.error === 'string') {
-          Alert.alert('ログインエラー', data.error);
-        }
+    if (response.ok) {
+      const token = data.token; // ← ここはAPIの返却形式に応じて確認
+
+      if (token) {
+        await AsyncStorage.setItem('jwtToken', token);
+        console.log('JWT保存完了:', token);
       }
-    } catch (error) {
-      setMessage('サインイン中にエラーが発生しました');
+
+      Alert.alert('ログイン成功', 'ダッシュボードへ移動します');
+      navigation.navigate('Dashboard'); // 型安全に画面遷移
+    } else {
+      // Zodバリデーション系
+      if (data.error?.password?._errors) {
+        setMessage(`エラー: ${data.error.password._errors[0]}`);
+      }
+      if (data.error?.email?._errors) {
+        setMessage2(`エラー: ${data.error.email._errors[0]}`);
+      }
+
+      // 単純な文字列エラー
+      if (typeof data.error === 'string') {
+        Alert.alert('ログインエラー', data.error);
+      }
+
+      // その他のエラー形式
+      if (data.message) {
+        Alert.alert('エラー', data.message);
+      }
     }
-  };
+  } catch (error) {
+    console.error('Login error:', error);
+    setMessage('サインイン中にネットワークエラーが発生しました');
+  }
+};
+
 
   return (
     <View style={styles.container}>
