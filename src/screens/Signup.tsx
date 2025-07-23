@@ -11,11 +11,30 @@ export default function SignupScreen({ navigation }: Props) {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
 
+  const validate = () => {
+    if (name.trim().length === 0) {
+      setMessage('名前は1文字以上入力してください');
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setMessage('正しいメールアドレスを入力してください');
+      return false;
+    }
+    if (password.length < 6) {
+      setMessage('パスワードは6文字以上にしてください');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async () => {
     setMessage('');
 
+    if (!validate()) return;
+
     try {
-      const response = await fetch('http://192.168.0.64:3000/signup', {
+      const response = await fetch('https://nextjs-skill-viewer.vercel.app/api/smartphone/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name }),
@@ -30,12 +49,19 @@ export default function SignupScreen({ navigation }: Props) {
         if (typeof data.error === 'string') {
           setMessage(data.error);
           Alert.alert('登録エラー', data.error);
+        } else if (data.error?.email?._errors) {
+          setMessage(data.error.email._errors[0]);
+        } else if (data.error?.password?._errors) {
+          setMessage(data.error.password._errors[0]);
+        } else if (data.message) {
+          setMessage(data.message);
         } else {
           setMessage('不明なエラーが発生しました');
         }
       }
     } catch (error) {
-      setMessage('サインアップ中にエラーが発生しました');
+      console.error(error);
+      setMessage('サインアップ中にネットワークエラーが発生しました');
     }
   };
 
@@ -61,7 +87,7 @@ export default function SignupScreen({ navigation }: Props) {
 
       <TextInput
         style={styles.input}
-        placeholder="パスワード"
+        placeholder="パスワード（6文字以上）"
         value={password}
         onChangeText={setPassword}
         secureTextEntry

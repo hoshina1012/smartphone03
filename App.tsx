@@ -18,12 +18,12 @@ function HomeScreen({ navigation }: HomeScreenProps) {
       <Pressable onPress={() => navigation.navigate('Login')}>
         <Text style={styles.title}>ログインする</Text>
       </Pressable>
-      {/* <Pressable
+      <Pressable
         onPress={() => navigation.navigate('Signup')}
         style={{ marginTop: 20 }}
       >
         <Text style={styles.title}>新規登録する</Text>
-      </Pressable> */}
+      </Pressable>
     </View>
   );
 }

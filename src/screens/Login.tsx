@@ -90,9 +90,9 @@ export default function LoginScreen() {
 
       <Button title="ログイン" onPress={handleLogin} />
 
-      {/* <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+      <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
         <Text style={styles.link}>アカウントをまだ登録していませんか?</Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
     </View>
   );
 }
