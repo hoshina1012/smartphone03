@@ -1,7 +1,8 @@
-// Dashboard.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 type Employee = {
   id: number;
@@ -37,8 +38,7 @@ const Dashboard = () => {
         }
 
         const data = await response.json();
-        setEmployees(data); // ここが配列前提
-
+        setEmployees(data);
       } catch (err: any) {
         setError(err.message);
       }
@@ -46,14 +46,6 @@ const Dashboard = () => {
 
     fetchEmployees();
   }, []);
-
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.error}>エラー: {error}</Text>
-      </View>
-    );
-  }
 
   const renderItem = ({ item }: { item: Employee }) => (
     <View style={styles.item}>
@@ -67,12 +59,20 @@ const Dashboard = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={employees}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-      />
+    <View style={styles.wrapper}>
+      <Header />
+      <View style={styles.container}>
+        {error ? (
+          <Text style={styles.error}>エラー: {error}</Text>
+        ) : (
+          <FlatList
+            data={employees}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderItem}
+          />
+        )}
+      </View>
+      <Footer />
     </View>
   );
 };
@@ -80,6 +80,10 @@ const Dashboard = () => {
 export default Dashboard;
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
     padding: 16,
@@ -93,5 +97,7 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
   },
 });

@@ -6,6 +6,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import LoginScreen from './src/screens/Login';
 import SignupScreen from './src/screens/Signup';
 import DashboardScreen from './src/screens/Dashboard';
+import { AuthProvider } from './src/contexts/AuthContext';
 import type { RootStackParamList } from './src/types/navigation';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -30,14 +31,16 @@ function HomeScreen({ navigation }: HomeScreenProps) {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'ホーム' }} />
-        <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'ログイン' }} />
-        <Stack.Screen name="Signup" component={SignupScreen} options={{ title: '新規登録' }} />
-        <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'ダッシュボード' }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'ホーム' }} />
+          <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'ログイン' }} />
+          <Stack.Screen name="Signup" component={SignupScreen} options={{ title: '新規登録' }} />
+          <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'ダッシュボード' }} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
 

@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } fr
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../contexts/AuthContext';
 
 
 // navigation.tsで定義したルート名の型をインポート（パスは適宜変更してください）
@@ -17,6 +18,7 @@ export default function LoginScreen() {
   const [message, setMessage] = useState('');
   const [message2, setMessage2] = useState('');
 
+  const { login } = useAuth();
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
@@ -30,12 +32,15 @@ export default function LoginScreen() {
     const data = await response.json();
 
     if (response.ok) {
-      const token = data.token; // ← ここはAPIの返却形式に応じて確認
+      console.log('ログイン成功レスポンス:', data);
+      const token = data.token;
 
       if (token) {
         await AsyncStorage.setItem('jwtToken', token);
         console.log('JWT保存完了:', token);
+        login(data.user, token);
       }
+
 
       Alert.alert('ログイン成功', 'ダッシュボードへ移動します');
       navigation.navigate('Dashboard'); // 型安全に画面遷移
