@@ -6,6 +6,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import LoginScreen from './src/screens/Login';
 import SignupScreen from './src/screens/Signup';
 import DashboardScreen from './src/screens/Dashboard';
+import EmployeesScreen from './src/screens/employees/Employees';
 import { AuthProvider } from './src/contexts/AuthContext';
 import type { RootStackParamList } from './src/types/navigation';
 
@@ -38,6 +39,7 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'ログイン' }} />
           <Stack.Screen name="Signup" component={SignupScreen} options={{ title: '新規登録' }} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'ダッシュボード' }} />
+          <Stack.Screen name="Employees" component={EmployeesScreen} options={{ title: '社員' }} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

@@ -14,6 +14,21 @@ type Employee = {
   status: string;
 };
 
+const translateStatus = (status: string): string => {
+  switch (status) {
+    case 'ONSITE':
+      return '現場';
+    case 'OFFICE':
+      return '内勤';
+    case 'TRAINING':
+      return '研修中';
+    case 'SEARCHING':
+      return '現場探し中';
+    default:
+      return status; // 万が一未定義のステータスが来た場合はそのまま表示
+  }
+};
+
 const Dashboard = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +69,7 @@ const Dashboard = () => {
       <Text>Email: {item.email}</Text>
       <Text>部署: {item.department}</Text>
       <Text>役職: {item.position}</Text>
-      <Text>ステータス: {item.status}</Text>
+      <Text>ステータス: {translateStatus(item.status)}</Text>
     </View>
   );
 

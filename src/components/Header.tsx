@@ -19,6 +19,9 @@ export default function Header() {
       {isLoggedIn ? (
         <View style={styles.links}>
           <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}>
+            <Text style={styles.link}>ダッシュボード</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Employees')}>
             <Text style={styles.link}>社員</Text>
           </TouchableOpacity>
           {/* {user?.role === 'ADMIN' && (
