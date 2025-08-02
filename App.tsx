@@ -1,4 +1,3 @@
-// App.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -7,6 +6,7 @@ import LoginScreen from './src/screens/Login';
 import SignupScreen from './src/screens/Signup';
 import DashboardScreen from './src/screens/Dashboard';
 import EmployeesScreen from './src/screens/employees/Employees';
+import EmployeeDetail from './src/screens/employees/EmployeeDetail';
 import { AuthProvider } from './src/contexts/AuthContext';
 import type { RootStackParamList } from './src/types/navigation';
 
@@ -40,6 +40,7 @@ export default function App() {
           <Stack.Screen name="Signup" component={SignupScreen} options={{ title: '新規登録' }} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'ダッシュボード' }} />
           <Stack.Screen name="Employees" component={EmployeesScreen} options={{ title: '社員' }} />
+          <Stack.Screen name="EmployeeDetail" component={EmployeeDetail} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

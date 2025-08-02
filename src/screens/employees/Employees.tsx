@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { Picker } from '@react-native-picker/picker';
+import { useNavigation, NavigationProp, useFocusEffect } from '@react-navigation/native';
+import { RootStackParamList } from '../../types/navigation';
 
-type Employee = {
+export type Employee = {
   id: number;
   firstName: string;
   lastName: string;
@@ -63,11 +65,24 @@ const EmployeesScreen = () => {
   hireDate: '',
 });
 
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
+const formatDate = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  return new Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(date);
+};
 
-  const fetchEmployees = async () => {
+useFocusEffect(
+  useCallback(() => {
+    fetchEmployees();
+  }, [])
+);
+
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+const fetchEmployees = async () => {
     try {
       const token = await AsyncStorage.getItem('jwtToken');
       if (!token) {
@@ -166,7 +181,11 @@ const EmployeesScreen = () => {
       <Text>部署: {item.department}</Text>
       <Text>役職: {item.position}</Text>
       <Text>ステータス: {translateStatus(item.status)}</Text>
-      <Text>入社日: {item.hireDate}</Text>
+      <Text>入社日: {formatDate(item.hireDate)}</Text>
+      <Button
+        title="詳細"
+        onPress={() => navigation.navigate('EmployeeDetail', { employee: item })}
+      />
     </View>
   );
 
