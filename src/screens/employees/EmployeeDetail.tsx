@@ -13,6 +13,7 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 type Employee = {
   id: number;
@@ -52,6 +53,7 @@ const EmployeeDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState<Employee>({ ...employee });
   const [formData, setFormData] = useState<Employee>({ ...employee });
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const convertStatus = (status: string) => {
     switch (status) {
@@ -60,6 +62,14 @@ const EmployeeDetail = () => {
       case 'TRAINING': return '研修中';
       case 'SEARCHING': return '現場探し中';
       default: return status;
+    }
+  };
+
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      const formattedDate = selectedDate.toISOString().split('T')[0]; // yyyy-mm-dd
+      setFormData({ ...formData, hireDate: formattedDate });
     }
   };
 
@@ -270,7 +280,31 @@ const EmployeeDetail = () => {
         )}
 
         <Text style={styles.label}>入社日:</Text>
-        <Text style={styles.value}>{formatDate(currentEmployee.hireDate)}</Text>
+          {isEditing ? (
+            <View>
+              <TouchableOpacity
+                style={styles.datePickerButton}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Text style={styles.datePickerText}>
+                  {formData.hireDate
+                    ? new Date(formData.hireDate).toISOString().split('T')[0] // yyyy-mm-dd形式
+                    : '入社日を選択'}
+                </Text>
+              </TouchableOpacity>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={formData.hireDate ? new Date(formData.hireDate) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                />
+              )}
+            </View>
+          ) : (
+            <Text style={styles.value}>{formatDate(currentEmployee.hireDate)}</Text>
+          )}
       </View>
 
       <Footer />
@@ -330,5 +364,19 @@ const styles = StyleSheet.create({
   picker: {
     height: 54,
     fontSize: 16,
+  },
+  datePickerButton: {
+    height: 44,
+    borderColor: '#D1D5DB',
+    borderWidth: 1,
+    borderRadius: 6,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+  },
+  datePickerText: {
+    fontSize: 16,
+    color: '#333',
   },
 });

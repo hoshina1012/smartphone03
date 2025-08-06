@@ -6,6 +6,7 @@ import Footer from '../../components/Footer';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, NavigationProp, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/navigation';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export type Employee = {
   id: number;
@@ -46,6 +47,7 @@ const EmployeesScreen = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [newEmployee, setNewEmployee] = useState<{
   email: string;
@@ -64,6 +66,14 @@ const EmployeesScreen = () => {
   status: '現場',
   hireDate: '',
 });
+
+const handleDateChange = (event: any, selectedDate?: Date) => {
+  setShowDatePicker(false); // カレンダーを閉じる
+  if (selectedDate) {
+    const formattedDate = selectedDate.toISOString().split('T')[0]; // yyyy-mm-dd
+    setNewEmployee({ ...newEmployee, hireDate: formattedDate });
+  }
+};
 
 const formatDate = (dateStr: string): string => {
   const date = new Date(dateStr);
@@ -242,12 +252,25 @@ const fetchEmployees = async () => {
               <Picker.Item label="研修中" value="研修中" />
               <Picker.Item label="現場探し中" value="現場探し中" />
             </Picker>
-            <TextInput
-              style={styles.input}
-              placeholder="入社日（yyyy-mm-dd）"
-              value={newEmployee.hireDate}
-              onChangeText={(text) => setNewEmployee({ ...newEmployee, hireDate: text })}
-            />
+            <View>
+              <TouchableOpacity
+                style={styles.datePickerButton}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Text style={styles.datePickerText}>
+                  {newEmployee.hireDate ? newEmployee.hireDate : '入社日を選択'}
+                </Text>
+              </TouchableOpacity>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={newEmployee.hireDate ? new Date(newEmployee.hireDate) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                />
+              )}
+            </View>
             <Button title="保存" onPress={handleSave} />
           </View>
         )}
@@ -324,5 +347,19 @@ const styles = StyleSheet.create({
     height: 54,
     backgroundColor: '#fff',
     marginBottom: 10,
+  },
+  datePickerButton: {
+    height: 44,
+    borderColor: '#D1D5DB',
+    borderWidth: 1,
+    borderRadius: 6,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+  },
+  datePickerText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
