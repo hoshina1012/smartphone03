@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -20,6 +20,23 @@ export default function LoginScreen() {
 
   const { login } = useAuth();
   const navigation = useNavigation<LoginScreenNavigationProp>();
+
+  useFocusEffect(
+  React.useCallback(() => {
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem('jwtToken');
+      if (token) {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Dashboard' }],
+          })
+        );
+      }
+    };
+    checkLoginStatus();
+  }, [])
+);
 
   const handleLogin = async () => {
   try {

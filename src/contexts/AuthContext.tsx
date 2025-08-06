@@ -1,51 +1,73 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  role?: 'ADMIN' | 'USER';
-};
 
 type AuthContextType = {
   isLoggedIn: boolean;
-  user: User | null;
+  user: any;
   token: string | null;
-  login: (userData: User, authToken: string) => void;
+  loading: boolean;
+  login: (token: string, userData: any) => void;
   logout: () => void;
 };
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({
+  isLoggedIn: false,
+  user: null,
+  token: null,
+  loading: true,
+  login: () => {},
+  logout: () => {},
+});
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = (userData: User, authToken: string) => {
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const savedToken = await AsyncStorage.getItem('jwtToken');
+        const savedUser = await AsyncStorage.getItem('user');
+        if (savedToken) {
+          setToken(savedToken);
+          setIsLoggedIn(true);
+          if (savedUser) {
+            setUser(JSON.parse(savedUser));
+          }
+        }
+      } catch (error) {
+        console.error('ログイン状態チェック中にエラー:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  const login = async (token: string, userData: any) => {
+    setToken(token);
     setUser(userData);
-    setToken(authToken);
+    setIsLoggedIn(true);
+    await AsyncStorage.setItem('jwtToken', token);
+    await AsyncStorage.setItem('user', JSON.stringify(userData));
   };
 
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
     setToken(null);
-    AsyncStorage.removeItem('jwtToken'); // オプション：ログアウト時に削除
+    setUser(null);
+    setIsLoggedIn(false);
+    await AsyncStorage.removeItem('jwtToken');
+    await AsyncStorage.removeItem('user');
   };
-
-  const isLoggedIn = !!token;
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, token, login, logout }}>
-  {children}
-</AuthContext.Provider>
+    <AuthContext.Provider value={{ isLoggedIn, user, token, loading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
   );
 };
 
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
