@@ -12,8 +12,8 @@ import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import CustomPicker from '../../components/CustomPicker';
 
 type Employee = {
   id: number;
@@ -199,7 +199,16 @@ const EmployeeDetail = () => {
           </>
         ) : (
           <>
-            <Button title="編集" onPress={() => setIsEditing(true)} />
+            <Button
+              title="編集"
+              onPress={() => {
+                setFormData({
+                  ...formData,
+                  status: reverseStatusMap[formData.status] || formData.status
+                });
+                setIsEditing(true);
+              }}
+            />
             <Button title="削除" color="red" onPress={handleDelete} />
           </>
         )}
@@ -263,18 +272,11 @@ const EmployeeDetail = () => {
 
         <Text style={styles.label}>ステータス:</Text>
         {isEditing ? (
-          <View style={styles.pickerWrapper}>
-    <Picker
-      selectedValue={formData.status}
-      onValueChange={(value) => handleChange('status', value)}
-      style={styles.picker}
-    >
-      <Picker.Item label="現場" value="現場" />
-      <Picker.Item label="内勤" value="内勤" />
-      <Picker.Item label="研修中" value="研修中" />
-      <Picker.Item label="現場探し中" value="現場探し中" />
-    </Picker>
-  </View>
+          <CustomPicker
+            selectedValue={formData.status}
+            onSelect={(value) => handleChange('status', value)}
+            options={['現場', '内勤', '研修中', '現場探し中']}
+          />
         ) : (
           <Text style={styles.value}>{convertStatus(currentEmployee.status)}</Text>
         )}

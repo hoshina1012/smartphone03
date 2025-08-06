@@ -3,10 +3,10 @@ import { View, Text, FlatList, StyleSheet, TextInput, Button, Alert, TouchableOp
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import { Picker } from '@react-native-picker/picker';
 import { useNavigation, NavigationProp, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/navigation';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import CustomPicker from '../../components/CustomPicker';
 
 export type Employee = {
   id: number;
@@ -55,7 +55,7 @@ const EmployeesScreen = () => {
   firstName: string;
   department: string;
   position: string;
-  status: StatusLabel;
+  status: string;
   hireDate: string;
 }>({
   email: '',
@@ -137,7 +137,7 @@ const fetchEmployees = async () => {
       lastName,
       department,
       position,
-      status: statusMap[status], // ← ★ここで日本語→Enum形式に変換
+      status: statusMap[status as StatusLabel], // ← ★ここで日本語→Enum形式に変換
       hireDate,
     };
 
@@ -242,16 +242,11 @@ const fetchEmployees = async () => {
               value={newEmployee.position}
               onChangeText={(text) => setNewEmployee({ ...newEmployee, position: text })}
             />
-            <Picker
+            <CustomPicker
               selectedValue={newEmployee.status}
-              onValueChange={(itemValue) => setNewEmployee({ ...newEmployee, status: itemValue })}
-              style={styles.picker}
-            >
-              <Picker.Item label="現場" value="現場" />
-              <Picker.Item label="内勤" value="内勤" />
-              <Picker.Item label="研修中" value="研修中" />
-              <Picker.Item label="現場探し中" value="現場探し中" />
-            </Picker>
+              onSelect={(value) => setNewEmployee({ ...newEmployee, status: value })}
+              options={['現場', '内勤', '研修中', '現場探し中']}
+            />
             <View>
               <TouchableOpacity
                 style={styles.datePickerButton}
@@ -342,11 +337,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10,
     backgroundColor: '#fff',
-  },
-  picker: {
-    height: 54,
-    backgroundColor: '#fff',
-    marginBottom: 10,
   },
   datePickerButton: {
     height: 44,
