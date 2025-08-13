@@ -7,4 +7,6 @@ export type RootStackParamList = {
   Dashboard: undefined;
   Employees: undefined;
   EmployeeDetail: { employee: Employee };
+  Skills: undefined;
+  SkillDetail: { id: number };
 };

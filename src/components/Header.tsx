@@ -24,11 +24,9 @@ export default function Header() {
           <TouchableOpacity onPress={() => navigation.navigate('Employees')}>
             <Text style={styles.link}>社員</Text>
           </TouchableOpacity>
-          {/* {user?.role === 'ADMIN' && (
-            <TouchableOpacity onPress={() => navigation.navigate('Users')}>
-              <Text style={styles.link}>ユーザー</Text>
-            </TouchableOpacity>
-          )} */}
+          <TouchableOpacity onPress={() => navigation.navigate('Skills')}>
+            <Text style={styles.link}>スキル</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             logout();
             navigation.navigate('Login');
