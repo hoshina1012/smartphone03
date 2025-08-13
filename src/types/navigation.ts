@@ -1,4 +1,5 @@
 import { Employee } from '../screens/employees/Employees';
+import { Skill } from '../screens/skills/Skills';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -8,5 +9,5 @@ export type RootStackParamList = {
   Employees: undefined;
   EmployeeDetail: { employee: Employee };
   Skills: undefined;
-  SkillDetail: { id: number };
+  SkillDetail: { skill: Skill };
 };

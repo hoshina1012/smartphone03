@@ -7,7 +7,7 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type Skill = {
+export type Skill = {
   id: number;
   name: string;
   category: string;
@@ -111,17 +111,19 @@ export default function Skills() {
   };
 
   const renderItem = ({ item }: { item: Skill }) => (
-    <TouchableOpacity
-      style={styles.item}
-      onPress={() => navigation.navigate("SkillDetail", { id: item.id })}
-    >
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.category}>{item.category}</Text>
-      {item.description ? (
-        <Text style={styles.description}>{item.description}</Text>
-      ) : null}
-    </TouchableOpacity>
-  );
+  <View style={styles.item}>
+    <Text style={styles.name}>{item.name}</Text>
+    <Text style={styles.category}>{item.category}</Text>
+    {item.description ? (
+      <Text style={styles.description}>{item.description}</Text>
+    ) : null}
+    <Button
+      title="詳細"
+      onPress={() => navigation.navigate("SkillDetail", { skill: item })}
+    />
+  </View>
+);
+
 
   if (loading) {
     return (
