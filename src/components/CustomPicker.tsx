@@ -1,24 +1,31 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet } from 'react-native';
 
+export type PickerOption = {
+  label: string;
+  value: string | number;
+};
+
 type CustomPickerProps = {
   selectedValue: string;
   onSelect: (val: string) => void;
-  options: string[];
+  options: PickerOption[];
 };
 
 const CustomPicker: React.FC<CustomPickerProps> = ({ selectedValue, onSelect, options }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleSelect = (value: string) => {
-    onSelect(value);
+  const handleSelect = (value: string | number) => {
+    onSelect(String(value)); // 常に string に変換
     setModalVisible(false);
   };
 
   return (
     <View>
       <TouchableOpacity style={styles.selectedItem} onPress={() => setModalVisible(true)}>
-        <Text style={styles.selectedText}>{selectedValue}</Text>
+        <Text style={styles.selectedText}>
+          {options.find(opt => String(opt.value) === selectedValue)?.label || '選択してください'}
+        </Text>
       </TouchableOpacity>
 
       <Modal visible={modalVisible} transparent animationType="fade">
@@ -26,10 +33,10 @@ const CustomPicker: React.FC<CustomPickerProps> = ({ selectedValue, onSelect, op
           <View style={styles.modalContent}>
             <FlatList
               data={options}
-              keyExtractor={(item) => item}
+              keyExtractor={(item) => String(item.value)}
               renderItem={({ item }) => (
-                <TouchableOpacity style={styles.optionItem} onPress={() => handleSelect(item)}>
-                  <Text style={styles.optionText}>{item}</Text>
+                <TouchableOpacity style={styles.optionItem} onPress={() => handleSelect(item.value)}>
+                  <Text style={styles.optionText}>{item.label}</Text>
                 </TouchableOpacity>
               )}
             />

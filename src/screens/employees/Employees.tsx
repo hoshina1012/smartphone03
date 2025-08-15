@@ -245,7 +245,12 @@ const fetchEmployees = async () => {
             <CustomPicker
               selectedValue={newEmployee.status}
               onSelect={(value) => setNewEmployee({ ...newEmployee, status: value })}
-              options={['現場', '内勤', '研修中', '現場探し中']}
+              options={[
+                { label: '現場', value: '現場' },
+                { label: '内勤', value: '内勤' },
+                { label: '研修中', value: '研修中' },
+                { label: '現場探し中', value: '現場探し中' },
+              ]}
             />
             <View>
               <TouchableOpacity
