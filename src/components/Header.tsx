@@ -27,6 +27,9 @@ export default function Header() {
           <TouchableOpacity onPress={() => navigation.navigate('Skills')}>
             <Text style={styles.link}>スキル</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Assignments')}>
+            <Text style={styles.link}>課題</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             logout();
             navigation.navigate('Login');

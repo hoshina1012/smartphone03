@@ -9,6 +9,8 @@ import EmployeesScreen from './src/screens/employees/Employees';
 import EmployeeDetail from './src/screens/employees/EmployeeDetail';
 import Skills from "./src/screens/skills/Skills";
 import SkillDetail from "./src/screens/skills/SkillDetail";
+import Assignments from "./src/screens/assignments/Assignments";
+import AssignmentDetail from "./src/screens/assignments/AssignmentDetail";
 import { AuthProvider } from './src/contexts/AuthContext';
 import type { RootStackParamList } from './src/types/navigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -60,9 +62,11 @@ export default function App() {
           <Stack.Screen name="Signup" component={SignupScreen} options={{ title: '新規登録' }} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'ダッシュボード' }} />
           <Stack.Screen name="Employees" component={EmployeesScreen} options={{ title: '社員' }} />
-          <Stack.Screen name="EmployeeDetail" component={EmployeeDetail} />
+          <Stack.Screen name="EmployeeDetail" component={EmployeeDetail} options={{ title: '社員詳細' }} />
           <Stack.Screen name="Skills" component={Skills} options={{ title: "スキル一覧" }} />
           <Stack.Screen name="SkillDetail" component={SkillDetail} options={{ title: "スキル詳細" }} />
+          <Stack.Screen name="Assignments" component={Assignments} options={{ title: "課題一覧" }} />
+          <Stack.Screen name="AssignmentDetail" component={AssignmentDetail} options={{ title: "課題詳細" }} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>
