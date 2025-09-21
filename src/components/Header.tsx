@@ -30,6 +30,9 @@ export default function Header() {
           <TouchableOpacity onPress={() => navigation.navigate('Assignments')}>
             <Text style={styles.link}>課題</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Tasks')}>
+            <Text style={styles.link}>タスク</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             logout();
             navigation.navigate('Login');
