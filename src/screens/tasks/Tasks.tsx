@@ -135,6 +135,16 @@ export default function Tasks() {
     fetchTasks();
   }, []);
 
+  // 統計データの計算（fetchTasks useEffectの後に追加）
+  const totalTasks = tasks.length;
+  const pendingTasks = tasks.filter(task => task.status === 'PENDING').length;
+  const inProgressTasks = tasks.filter(
+    task => task.status === 'IN_PROGRESS',
+  ).length;
+  const overdueTasks = tasks.filter(
+    task => task.status !== 'COMPLETED' && new Date(task.dueDate) < new Date(),
+  ).length;
+
   const renderItem = ({ item }: { item: Task }) => {
     const isOverdue =
       item.status !== 'COMPLETED' && new Date(item.dueDate) < new Date();
@@ -151,6 +161,14 @@ export default function Tasks() {
             <Text style={styles.detailButtonText}>詳細</Text>
           </TouchableOpacity>
         </View>
+
+        {/* 期限切れ表示 */}
+        {isOverdue && (
+          <View style={styles.overdueContainer}>
+            <Text style={styles.overdueText}>期限切れ</Text>
+          </View>
+        )}
+
         <Text style={styles.description}>{item.description}</Text>
 
         <View style={styles.row}>
@@ -201,6 +219,32 @@ export default function Tasks() {
       <Header />
       <View style={styles.container}>
         <Text style={styles.title}>タスク一覧</Text>
+
+        {/* 統計情報 */}
+        {!loading && (
+          <View style={styles.statsContainer}>
+            <View style={[styles.statCard, styles.totalCard]}>
+              <Text style={styles.totalText}>総タスク数</Text>
+              <Text style={styles.totalNumber}>{totalTasks}</Text>
+            </View>
+
+            <View style={[styles.statCard, styles.pendingCard]}>
+              <Text style={styles.pendingText}>未対応</Text>
+              <Text style={styles.pendingNumber}>{pendingTasks}</Text>
+            </View>
+
+            <View style={[styles.statCard, styles.inProgressCard]}>
+              <Text style={styles.inProgressText}>進行中</Text>
+              <Text style={styles.inProgressNumber}>{inProgressTasks}</Text>
+            </View>
+
+            <View style={[styles.statCard, styles.overdueCard]}>
+              <Text style={styles.overdueText2}>期限切れ</Text>
+              <Text style={styles.overdueNumber}>{overdueTasks}</Text>
+            </View>
+          </View>
+        )}
+
         {loading ? (
           <ActivityIndicator size="large" style={{ marginTop: 20 }} />
         ) : (
@@ -270,5 +314,88 @@ const styles = StyleSheet.create({
   detailButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  overdueContainer: {
+    alignSelf: 'flex-start',
+    marginBottom: 6,
+  },
+  overdueText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#dc2626', // 赤色
+    backgroundColor: '#fecaca', // 薄い赤背景
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 4,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  statCard: {
+    flex: 1,
+    minWidth: '22%',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  totalCard: {
+    backgroundColor: '#f3f4f6', // グレー背景
+  },
+  totalText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#000', // 黒文字
+    marginBottom: 4,
+  },
+  totalNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  pendingCard: {
+    backgroundColor: '#fef3c7', // 薄い黄色背景
+  },
+  pendingText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#d97706', // 黄色文字
+    marginBottom: 4,
+  },
+  pendingNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#d97706',
+  },
+  inProgressCard: {
+    backgroundColor: '#dbeafe', // 薄い青背景
+  },
+  inProgressText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#2563eb', // 青文字
+    marginBottom: 4,
+  },
+  inProgressNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2563eb',
+  },
+  overdueCard: {
+    backgroundColor: '#fee2e2', // 薄い赤背景
+  },
+  overdueText2: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#dc2626', // 赤文字
+    marginBottom: 4,
+  },
+  overdueNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#dc2626',
   },
 });
