@@ -33,6 +33,9 @@ export default function Header() {
           <TouchableOpacity onPress={() => navigation.navigate('Tasks')}>
             <Text style={styles.link}>タスク</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Activities')}>
+            <Text style={styles.link}>アクティビティ</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             logout();
             navigation.navigate('Login');
