@@ -55,8 +55,6 @@ const formatDate = (dateStr: string): string => {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
   }).format(date);
 };
 
@@ -97,6 +95,10 @@ export default function TaskDetail() {
     COMPLETED: {
       label: '完了',
       style: { backgroundColor: '#d4edda', color: '#28a745' },
+    },
+    CANCELLED: {
+      label: 'キャンセル',
+      style: { backgroundColor: '#fee2e2', color: '#dc2626' },
     },
   };
 
