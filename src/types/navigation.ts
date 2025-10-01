@@ -3,7 +3,7 @@ import { Skill } from '../screens/skills/Skills';
 import { Assignment } from '../screens/assignments/Assignments';
 import { Task } from '../screens/tasks/tasks';
 import { Activity } from '../screens/activities/activities';
-// import { Customer } from '../screens/customers/customers';
+import { Customer } from '../screens/customers/customers';
 import { Company } from '../screens/companies/companies';
 
 export type RootStackParamList = {
@@ -22,7 +22,7 @@ export type RootStackParamList = {
   Activities: undefined;
   ActivityDetail: { activity: Activity };
   Customers: undefined;
-  // CustomerDetail: { customer: Customer };
+  CustomerDetail: { customer: Customer };
   Companies: undefined;
   CompanyDetail: { company: Company };
 };

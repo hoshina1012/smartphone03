@@ -36,6 +36,9 @@ export default function Header() {
           <TouchableOpacity onPress={() => navigation.navigate('Activities')}>
             <Text style={styles.link}>アクティビティ</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Customers')}>
+            <Text style={styles.link}>顧客</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Companies')}>
             <Text style={styles.link}>企業</Text>
           </TouchableOpacity>

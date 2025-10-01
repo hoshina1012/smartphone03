@@ -15,8 +15,8 @@ import Tasks from "./src/screens/tasks/Tasks";
 import TaskDetail from "./src/screens/tasks/TaskDetail";
 import Activities from "./src/screens/activities/Activities";
 import ActivityDetail from "./src/screens/activities/ActivityDetail";
-// import Customers from "./src/screens/customers/Customers";
-// import CustomerDetail from "./src/screens/customers/CustomerDetail";
+import Customers from "./src/screens/customers/Customers";
+import CustomerDetail from "./src/screens/customers/CustomerDetail";
 import Companies from "./src/screens/companies/Companies";
 import CompanyDetail from "./src/screens/companies/CompanyDetail";
 import { AuthProvider } from './src/contexts/AuthContext';
@@ -79,8 +79,8 @@ export default function App() {
           <Stack.Screen name="TaskDetail" component={TaskDetail} options={{ title: "タスク詳細" }} />
           <Stack.Screen name="Activities" component={Activities} options={{ title: "アクティビティ一覧" }} />
           <Stack.Screen name="ActivityDetail" component={ActivityDetail} options={{ title: "アクティビティ詳細" }} />
-          {/* <Stack.Screen name="Customers" component={Customers} options={{ title: "顧客一覧" }} />
-          <Stack.Screen name="CustomerDetail" component={CustomerDetail} options={{ title: "顧客詳細" }} /> */}
+          <Stack.Screen name="Customers" component={Customers} options={{ title: "顧客一覧" }} />
+          <Stack.Screen name="CustomerDetail" component={CustomerDetail} options={{ title: "顧客詳細" }} />
           <Stack.Screen name="Companies" component={Companies} options={{ title: "企業一覧" }} />
           <Stack.Screen name="CompanyDetail" component={CompanyDetail} options={{ title: "企業詳細" }} />
         </Stack.Navigator>
