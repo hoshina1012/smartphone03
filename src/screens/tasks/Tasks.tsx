@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../types/navigation';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -138,32 +138,42 @@ export default function Tasks() {
     },
   };
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const token = await AsyncStorage.getItem('jwtToken');
-        if (!token) {
-          Alert.alert('エラー', 'トークンがありません');
-          return;
-        }
-
-        const res = await fetch(
-          'https://nextjs-skill-viewer.vercel.app/api/tasks',
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        const data = await res.json();
-        setTasks(data.tasks || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+  // タスク一覧を取得する関数
+  const fetchTasks = useCallback(async () => {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem('jwtToken');
+      if (!token) {
+        Alert.alert('エラー', 'トークンがありません');
+        return;
       }
-    };
 
-    fetchTasks();
+      const res = await fetch(
+        'https://nextjs-skill-viewer.vercel.app/api/tasks',
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const data = await res.json();
+      setTasks(data.tasks || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  // 初回マウント時にタスクを取得
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
+
+  // この画面にフォーカスが当たるたびにタスクを再取得
+  useFocusEffect(
+    useCallback(() => {
+      fetchTasks();
+    }, [fetchTasks])
+  );
 
   // 従業員一覧取得
   useEffect(() => {
@@ -244,6 +254,69 @@ export default function Tasks() {
     }
   };
 
+  const handleTaskAction = async (task: Task, newStatus: string) => {
+    try {
+      const token = await AsyncStorage.getItem('jwtToken');
+      if (!token) {
+        Alert.alert('エラー', 'トークンがありません');
+        return;
+      }
+
+      // タスクのステータス更新
+      const updateRes = await fetch(
+        `https://nextjs-skill-viewer.vercel.app/api/tasks/${task.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            status: newStatus,
+          }),
+        },
+      );
+
+      if (!updateRes.ok) {
+        throw new Error('タスクの更新に失敗しました');
+      }
+
+      Alert.alert(
+        '成功', 
+        newStatus === 'COMPLETED' ? 'タスクを完了しました' : 'タスクを開始しました'
+      );
+
+      // タスク一覧を再取得
+      await fetchTasks();
+
+    } catch (error: any) {
+      Alert.alert('エラー', error.message);
+    }
+  };
+
+  const renderActionButton = (task: Task) => {
+    if (task.status === 'PENDING') {
+      return (
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => handleTaskAction(task, 'IN_PROGRESS')}
+        >
+          <Text style={styles.startButtonText}>開始</Text>
+        </TouchableOpacity>
+      );
+    } else if (task.status === 'IN_PROGRESS') {
+      return (
+        <TouchableOpacity
+          style={styles.completeButton}
+          onPress={() => handleTaskAction(task, 'COMPLETED')}
+        >
+          <Text style={styles.completeButtonText}>完了</Text>
+        </TouchableOpacity>
+      );
+    }
+    return null;
+  };
+
   const handleSave = async () => {
     if (!newTask.title || !newTask.description || !newTask.dueDate) {
       Alert.alert('エラー', 'タイトル、説明、期限は必須です');
@@ -305,14 +378,7 @@ export default function Tasks() {
       setShowForm(false);
 
       // タスク一覧を再取得
-      const res = await fetch(
-        'https://nextjs-skill-viewer.vercel.app/api/tasks',
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      const data = await res.json();
-      setTasks(data.tasks || []);
+      await fetchTasks();
     } catch (error: any) {
       Alert.alert('エラー', error.message);
     }
@@ -327,12 +393,15 @@ export default function Tasks() {
       <View style={[styles.card, { backgroundColor: cardBackground }]}>
         <View style={styles.titleRow}>
           <Text style={styles.taskTitle}>{item.title}</Text>
-          <TouchableOpacity
-            style={styles.detailButton}
-            onPress={() => navigation.navigate('TaskDetail', { task: item })}
-          >
-            <Text style={styles.detailButtonText}>詳細</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonRow}>
+            {renderActionButton(item)}
+            <TouchableOpacity
+              style={styles.detailButton}
+              onPress={() => navigation.navigate('TaskDetail', { task: item })}
+            >
+              <Text style={styles.detailButtonText}>詳細</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {isOverdue && (
@@ -356,7 +425,7 @@ export default function Tasks() {
         <Text>作成者: {item.createdBy?.name}</Text>
         <Text>
           担当者:{' '}
-          {item.assignments.map(a => a.user.name).join(', ') || '未割当'}
+          {item.assignments.map((a: Assignment) => a.user.name).join(', ') || '未割当'}
         </Text>
         <Text>
           関連従業員:{' '}
@@ -724,30 +793,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
     borderRadius: 8,
   },
-  multiSelectContainer: {
-    marginBottom: 12,
-  },
-  multiSelectItem: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginBottom: 4,
-    borderRadius: 6,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-  },
-  multiSelectItemSelected: {
-    backgroundColor: '#EBF4FF',
-    borderColor: '#3B82F6',
-  },
-  multiSelectText: {
-    fontSize: 14,
-    color: '#374151',
-  },
-  multiSelectTextSelected: {
-    color: '#3B82F6',
-    fontWeight: 'bold',
-  },
   input: {
     height: 44,
     borderColor: '#D1D5DB',
@@ -846,6 +891,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#111827',
     flex: 1,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  startButton: {
+    backgroundColor: '#10b981',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  startButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  completeButton: {
+    backgroundColor: '#3b82f6',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  completeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   detailButton: {
     backgroundColor: '#007bff',
